@@ -5,8 +5,8 @@ A ToDo application designed as a Proof of Concept, built during an internship at
 ## Tech Stack
 
 - **Frontend:** Angular 21
-- **Backend:** .NET 10 Web API (EF Core)
-- **Database:** SQL Server (running in Docker)
+- **Backend:** .NET 10
+- **Database:** SQL Server
 
 ## Current Status
 
