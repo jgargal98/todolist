@@ -25,6 +25,7 @@ import { Component, resource } from '@angular/core';
 })
 export class App {
   private readonly apiUrl = 'https://todolist-jgg.azurewebsites.net/api/';
+  //Not secure, but it is what it is - azure free tier :(
 
   apiResource = resource({
     loader: async () => {
