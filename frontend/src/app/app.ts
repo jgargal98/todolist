@@ -1,37 +1,69 @@
-import { Component, resource } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
   standalone: true,
+  imports: [CommonModule],
   template: `
-    <h1>Resultado de la API:</h1>
+    <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+      <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h1 class="text-2xl font-bold text-blue-600 mb-4 text-center">Prueba de Conexión</h1>
 
-    @if (apiResource.isLoading()) {
-      <p>Cargando string...</p>
-    }
+        @if (loading()) {
+          <div class="flex justify-center">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          </div>
+        } @else if (error()) {
+          <div class="bg-red-100 text-red-700 p-3 rounded border border-red-400">
+            <strong>Error:</strong> {{ error() }}
+          </div>
+        } @else {
+          <div class="bg-green-100 text-green-800 p-4 rounded border border-green-400">
+            <p class="text-sm uppercase font-semibold">Respuesta del servidor:</p>
+            <p class="text-lg italic">"{{ data() }}"</p>
+          </div>
+        }
 
-    @if (apiResource.value(); as text) {
-      <div class="card">
-        <p>
-          El servidor dice: <strong>{{ text }}</strong>
-        </p>
+        <button
+          (click)="fetchData()"
+          class="mt-6 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+        >
+          Reintentar conexión
+        </button>
       </div>
-    }
-
-    @if (apiResource.error()) {
-      <p style="color: red;">Error de conexión</p>
-    }
+    </div>
   `,
 })
-export class App {
-  private readonly apiUrl = 'https://todolist-jgg.azurewebsites.net/api/';
-  //Not secure, but it is what it is - azure free tier :(
+export class AppComponent implements OnInit {
+  // Signals para manejar el estado de forma limpia
+  data = signal<string>('');
+  loading = signal<boolean>(false);
+  error = signal<string | null>(null);
 
-  apiResource = resource({
-    loader: async () => {
+  private readonly apiUrl = 'https://todolist-jgg.azurewebsites.net/api/';
+
+  ngOnInit() {
+    this.fetchData();
+  }
+
+  async fetchData() {
+    this.loading.set(true);
+    this.error.set(null);
+
+    try {
       const response = await fetch(this.apiUrl);
-      // Usamos .text() en lugar de .json() porque recibimos un string
-      return await response.text();
-    },
-  });
+
+      if (!response.ok) {
+        throw new Error(`Error del servidor: ${response.status}`);
+      }
+
+      const text = await response.text();
+      this.data.set(text);
+    } catch (err: any) {
+      this.error.set(err.message || 'No se pudo conectar con el backend');
+    } finally {
+      this.loading.set(false);
+    }
+  }
 }
