@@ -6,7 +6,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "todo-front": {
+    "frontend": {
       "projectType": "application",
       "schematics": {},
       "root": "",
