@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+/*using Microsoft.EntityFrameworkCore;
 using MyNotesApp.Data;
 using MyNotesApp.Models;
 
@@ -37,14 +37,25 @@ using (var scope = app.Services.CreateScope())
 // 5. Endpoint de prueba (Health Check)
 app.MapGet("/", () => "hello world!");
 
-app.MapGet("/test-db", async (AppDbContext db) =>{
-    try{
+app.MapGet("/test-db", async (AppDbContext db) =>
+{
+    try
+    {
         var count = await db.Users.CountAsync();
         return Results.Ok(new { mensaje = "Conecction success", totalUsuarios = count });
     }
-    catch (Exception ex){
+    catch (Exception ex)
+    {
         return Results.Problem($"Connection error: {ex.Message}");
     }
 });
+
+app.Run();*/
+
+
+var builder = WebApplication.CreateBuilder(args);
+var app = builder.Build();
+
+app.MapGet("/", () => "Hello World from .NET 10 on Azure!");
 
 app.Run();
