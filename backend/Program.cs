@@ -1,11 +1,10 @@
-/*using Microsoft.EntityFrameworkCore;
-using MyNotesApp.Data;
-using MyNotesApp.Models;
+using Microsoft.EntityFrameworkCore;
+using TodoList.Data;
+using TodoList.Models;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// 1. Configure DB connection (Lee de variables de entorno para Docker)
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
 
@@ -35,7 +34,8 @@ using (var scope = app.Services.CreateScope())
 }
 
 // 5. Endpoint de prueba (Health Check)
-app.MapGet("/", () => "hello world!");
+
+app.MapGet("/", () => "Si lees esto me debes 20 pavos");
 
 app.MapGet("/test-db", async (AppDbContext db) =>
 {
@@ -50,12 +50,8 @@ app.MapGet("/test-db", async (AppDbContext db) =>
     }
 });
 
-app.Run();*/
 
 
-var builder = WebApplication.CreateBuilder(args);
-var app = builder.Build();
 
-app.MapGet("/", () => "Hello World from .NET 10 on Azure!");
 
 app.Run();

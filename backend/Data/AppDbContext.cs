@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using MyNotesApp.Models;
+using TodoList.Models;
 
-namespace MyNotesApp.Data;
+namespace TodoList.Data;
 
 public class AppDbContext : DbContext
 {
@@ -17,11 +17,11 @@ public class AppDbContext : DbContext
         {
             // SubTasks se guarda como JSON
             entity.OwnsMany(t => t.SubTasks, builder => { builder.ToJson(); });
-            
+
             // Tabla intermedia task_tags
             entity.HasMany(t => t.Tags)
                   .WithMany(tag => tag.Tasks)
-                  .UsingEntity("task_tags"); 
+                  .UsingEntity("task_tags");
         });
     }
 }
