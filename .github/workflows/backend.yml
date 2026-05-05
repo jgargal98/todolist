@@ -1,0 +1,58 @@
+name: Deploy Backend (.NET 10)
+
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - "backend/**" # Solo se dispara si cambia algo en la carpeta backend
+    workflow_dispatch:
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Set up .NET Core
+              uses: actions/setup-dotnet@v4
+              with:
+                  dotnet-version: "10.x"
+
+            - name: Build and Publish
+              run: |
+                  dotnet build --configuration Release
+                  dotnet publish -c Release -o ../publish
+              working-directory: ./backend
+
+            - name: Upload artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: .net-app
+                  path: ./publish
+
+    deploy:
+        runs-on: ubuntu-latest
+        needs: build
+        permissions:
+            id-token: write
+            contents: read
+        steps:
+            - name: Download artifact
+              uses: actions/download-artifact@v4
+              with:
+                  name: .net-app
+                  path: ./ready-to-deploy
+
+            - name: Login to Azure
+              uses: azure/login@v2
+              with:
+                  client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_99D36C1BF4C2480DA368914994BDE308 }}
+                  tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_7A57A0A94EB0415FBEC09EF40BDD02E4 }}
+                  subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_C5E3005A90DE43BCBEEE2B4B96E578D6 }}
+
+            - name: Deploy to Azure Web App
+              uses: azure/webapps-deploy@v3
+              with:
+                  app-name: "todolist-jgg"
+                  package: ./ready-to-deploy
