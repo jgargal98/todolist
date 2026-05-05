@@ -3,7 +3,15 @@ using TodoList.Data;
 using TodoList.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// .NET buscará en las Connection Strings de Azure primero.
+// Si no la encuentra ahí, buscará en el appsettings.json.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+if (string.IsNullOrEmpty(connectionString))
+{
+    throw new Exception("¡La cadena de conexión está vacía! Revisa la configuración en Azure.");
+}
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
