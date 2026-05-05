@@ -13,7 +13,8 @@ if (string.IsNullOrEmpty(connectionString)) {
 }
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(connectionString, sqlOptions =>
+        sqlOptions.EnableRetryOnFailure()));
 
 // 2. Configure CORS (Permitir que Angular se conecte)
 builder.Services.AddCors(options => {
@@ -39,7 +40,7 @@ using (var scope = app.Services.CreateScope()) {
 
 // 5. Endpoint de prueba (Health Check)
 
-app.MapGet("/", () => "Si lees esto me debes 20 pavos");
+app.MapGet("/api/", () => "Si lees esto me debes 20 pavos");
 
 app.MapGet("/test-db", async (AppDbContext db) => {
     try {
@@ -50,9 +51,5 @@ app.MapGet("/test-db", async (AppDbContext db) => {
         return Results.Problem($"Connection error: {ex.Message}");
     }
 });
-
-
-
-
 
 app.Run();
