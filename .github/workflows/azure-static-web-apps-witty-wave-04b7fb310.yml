@@ -33,9 +33,9 @@ jobs:
                   action: "upload"
 
                   ###### Configuración del Monorepo ######
-                  app_location: "/frontend" # Ruta raíz de tu Angular
+                  app_location: "/" # Ruta raíz de tu Angular
                   api_location: "" # Vacío, tu API es externa (App Service)
-                  output_location: "dist/todo-front/browser" # Ruta de salida de Angular 21
+                  output_location: "frontend/dist/todo-front/browser" # Ruta de salida de Angular 21
                   ###### Fin de la Configuración #######
 
     close_pull_request_job:
