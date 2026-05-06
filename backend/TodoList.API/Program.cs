@@ -1,5 +1,5 @@
 // 1. IMPORTANTE: Ahora los usings deben apuntar a tus nuevas capas
-using Microsoft.EntityFrameworkCore;
+//using Microsoft.EntityFrameworkCore;
 // using TodoList.Infrastructure.Data; // Descomenta esto cuando crees tu AppDbContext ahí
 // using TodoList.Domain.Entities;     // Descomenta esto cuando crees tu User ahí
 
