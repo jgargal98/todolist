@@ -17,7 +17,7 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<User>
         // We only define the relationship with Tasks explicitly
         builder.HasMany(u => u.Tasks)
             .WithOne(t => t.User)
-            .HasForeignKey(t => t.IdUser)
+            .HasForeignKey(t => t.UserId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }
