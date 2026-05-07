@@ -22,7 +22,7 @@ jobs:
             - name: Build and Publish
               run: |
                   dotnet build --configuration Release
-                  dotnet publish -c Release -o ../publish
+                  dotnet publish TodoList.API/TodoList.API.csproj -c Release -o ../publish
               working-directory: ./backend
 
             - name: Upload artifact
