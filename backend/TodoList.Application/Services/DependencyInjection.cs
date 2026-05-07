@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using TodoList.Application.Services.Interfaces;
+using TodoList.Application.Interfaces;
 
 namespace TodoList.Application.Services;
 
