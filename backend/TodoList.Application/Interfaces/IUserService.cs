@@ -1,11 +1,12 @@
+using TodoList.Application.DTOs.User;
 using TodoList.Domain.Entities;
 
-namespace TodoList.Application.Services.Interfaces;
+namespace TodoList.Application.Interfaces;
 
 /// <summary>
 /// Service interface for user-related business logic.
 /// </summary>
 public interface IUserService
 {
-    Task<IEnumerable<ApplicationUser>> GetUsersAsync();
+    Task<IEnumerable<UserResponseDto>> GetUsersAsync();
 }

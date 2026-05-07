@@ -1,17 +1,31 @@
-using TodoList.Application.Services.Interfaces;
-using TodoList.Domain.Entities;
+using AutoMapper;
+using TodoList.Application.DTOs.User;
+using TodoList.Application.Interfaces;
 using TodoList.Domain.Interfaces;
 
 namespace TodoList.Application.Services;
 
-/// <summary>
-/// Orchestrates user operations between the API and the Repository.
-/// </summary>
-public class UserService(IUserRepository userRepository) : IUserService
+public class UserService : IUserService
 {
-    public async Task<IEnumerable<ApplicationUser>> GetUsersAsync()
+    private readonly IUserRepository _userRepository;
+    private readonly IMapper _mapper;
+
+    public UserService(IUserRepository userRepository, IMapper mapper)
     {
-        // Business logic or DTO mapping would happen here
-        return await userRepository.GetAllUsersAsync();
+        _userRepository = userRepository;
+        _mapper = mapper;
+    }
+
+    /// <summary>
+    /// Fetches all users from the repository and maps them to UserResponseDto
+    /// </summary>
+    /// <returns>A list of data transfer objects representing users</returns>
+    public async Task<IEnumerable<UserResponseDto>> GetUsersAsync()
+    {
+        // 1. Get entities from the Infrastructure layer (Repository)
+        var users = await _userRepository.GetAllAsync();
+
+        // 2. Map the entities to DTOs to hide sensitive information
+        return _mapper.Map<IEnumerable<UserResponseDto>>(users);
     }
 }

@@ -8,9 +8,9 @@ namespace TodoList.Infrastructure.Data.Configurations;
 /// Extends the Identity User configuration to include custom relationships 
 /// like the collection of Tasks owned by the user.
 /// </summary>
-public class ApplicationUserConfiguration : IEntityTypeConfiguration<ApplicationUser>
+public class ApplicationUserConfiguration : IEntityTypeConfiguration<User>
 {
-    public void Configure(EntityTypeBuilder<ApplicationUser> builder)
+    public void Configure(EntityTypeBuilder<User> builder)
     {
         // Identity handles most properties (Email, Password, etc.)
 

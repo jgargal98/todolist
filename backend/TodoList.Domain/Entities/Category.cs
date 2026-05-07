@@ -16,7 +16,7 @@ public class Category
     /// Foreign Key to the User who owns this category (from ERD).
     /// </summary>
     public string UserId { get; set; } = string.Empty;
-    public virtual ApplicationUser User { get; set; } = null!;
+    public virtual User User { get; set; } = null!;
 
     /// <summary>
     /// Navigation property: List of tasks under this category.

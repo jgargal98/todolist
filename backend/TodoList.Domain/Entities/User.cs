@@ -5,7 +5,7 @@ namespace TodoList.Domain.Entities;
 /// <summary>
 /// Represents the custom user entity in the system, extending IdentityUser.
 /// </summary>
-public class ApplicationUser : IdentityUser
+public class User : IdentityUser
 {
     // Custom properties can be added here in the future
 

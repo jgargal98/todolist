@@ -7,7 +7,7 @@ namespace TodoList.Infrastructure.Data;
 /// <summary>
 /// Database context for the application, managing Identity and Domain entities mapping.
 /// </summary>
-public class AppDbContext : IdentityDbContext<ApplicationUser>
+public class AppDbContext : IdentityDbContext<User>
 {
     /// <summary>
     /// Initializes a new instance of the AppDbContext.

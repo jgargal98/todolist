@@ -32,7 +32,7 @@ public static class DependencyInjection
 
         // 2. IDENTITY CONFIGURATION
         // IMPORTANT: Requires 'Microsoft.AspNetCore.Identity.EntityFrameworkCore' NuGet package
-        services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+        services.AddIdentity<User, IdentityRole>(options =>
         {
             // Optional: Configure password requirements here to match your seed password
             options.Password.RequireDigit = true;

@@ -65,7 +65,7 @@ public static class DbInitializer
     /// <param name="configuration">Configuration to access environment-specific secrets.</param>
     private static async Task SeedAdminUserAsync(IServiceProvider services, ILogger logger, IConfiguration configuration)
     {
-        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+        var userManager = services.GetRequiredService<UserManager<User>>();
 
         // Retrieving credentials from IConfiguration (Environment Variables or AppSettings)
         // Azure Key: SeedData__AdminEmail / SeedData__AdminPassword
@@ -77,7 +77,7 @@ public static class DbInitializer
         {
             logger.LogInformation("No administrative user found. Seeding initial admin...");
 
-            var adminUser = new ApplicationUser
+            var adminUser = new User
             {
                 UserName = "admin",
                 Email = adminEmail,

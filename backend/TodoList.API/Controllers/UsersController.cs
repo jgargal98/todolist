@@ -1,22 +1,28 @@
+using Microsoft.AspNetCore.Mvc;
+using TodoList.Application.Interfaces;
+using TodoList.Application.DTOs.User;
+
 namespace TodoList.API.Controllers;
 
-using Microsoft.AspNetCore.Mvc;
-using TodoList.Application.Services.Interfaces;
-
-/// <summary>
-/// Controller for managing user-related test endpoints.
-/// </summary>
 [ApiController]
-[Route("api/[controller]")] // /api/users
-public class UsersController(IUserService userService) : ControllerBase
+[Route("api/[controller]")]
+public class UsersController : ControllerBase
 {
+    private readonly IUserService _userService;
+
+    public UsersController(IUserService userService)
+    {
+        _userService = userService;
+    }
+
     /// <summary>
-    /// Returns a list of all registered users.
+    /// GET: api/users
+    /// Returns a list of all registered users
     /// </summary>
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<ActionResult<IEnumerable<UserResponseDto>>> GetAll()
     {
-        var users = await userService.GetUsersAsync();
+        var users = await _userService.GetUsersAsync();
         return Ok(users);
     }
 }

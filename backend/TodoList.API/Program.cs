@@ -2,6 +2,7 @@ using TodoList.Infrastructure;
 using TodoList.Application.Services;
 using System.Reflection;
 using Microsoft.OpenApi;
+using TodoList.Application.Mappings;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 // --- 1. SERVICE CONFIGURATION (Dependency Injection Container) ---
 
 // --- REGISTER LAYERS ---
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddProfile<UserProfile>();
+}, AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddControllers();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);

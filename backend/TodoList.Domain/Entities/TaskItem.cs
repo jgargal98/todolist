@@ -27,11 +27,10 @@ public class TaskItem
 
     // Foreign Keys & Navigation
     public string UserId { get; set; } = string.Empty;
-    public virtual ApplicationUser User { get; set; } = null!;
+    public virtual User User { get; set; } = null!;
 
     public Guid? CategoryId { get; set; }
     public virtual Category? Category { get; set; }
 
     public virtual ICollection<Tag> Tags { get; set; } = new List<Tag>();
-    public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
 }

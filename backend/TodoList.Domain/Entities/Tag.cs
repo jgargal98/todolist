@@ -30,7 +30,7 @@ public class Tag
     /// Navigation property for the user who owns this tag.
     /// </summary>
     [ForeignKey("IdUser")]
-    public virtual ApplicationUser User { get; set; } = null!;
+    public virtual User User { get; set; } = null!;
 
     /// <summary>
     /// Navigation property for the many-to-many relationship with TaskItems.

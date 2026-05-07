@@ -8,12 +8,12 @@ using TodoList.Domain.Interfaces;
 /// <summary>
 /// Implementation of user-related data operations using ASP.NET Identity.
 /// </summary>
-public class UserRepository(UserManager<ApplicationUser> userManager) : IUserRepository
+public class UserRepository(UserManager<User> userManager) : IUserRepository
 {
     /// <summary>
     /// Retrieves all registered users using LINQ Method Syntax.
     /// </summary>
-    public async Task<IEnumerable<ApplicationUser>> GetAllUsersAsync()
+    public async Task<IEnumerable<User>> GetAllAsync()
     {
         // REQUIREMENT: Method syntax queries
         return await userManager.Users
