@@ -24,7 +24,7 @@ public class Tag
     /// Foreign key referencing the owner of the tag.
     /// </summary>
     [Required]
-    public string IdUser { get; set; } = string.Empty;
+    public string UserId { get; set; } = string.Empty;
 
     /// <summary>
     /// Navigation property for the user who owns this tag.

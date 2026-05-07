@@ -1,30 +1,17 @@
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using TodoList.Domain.Entities;
-using TodoList.Infrastructure.Data;
+using TodoList.Infrastructure;
+using TodoList.Application.Services;
 using System.Reflection;
 using Microsoft.OpenApi;
-using TodoList.Infrastructure;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // --- 1. SERVICE CONFIGURATION (Dependency Injection Container) ---
 
-/// <summary>
-/// Configure the Database Context with SQL Server.
-/// </summary>
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connectionString));
-
-/// <summary>
-/// Configure ASP.NET Core Identity for user management and security.
-/// </summary>
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<AppDbContext>()
-    .AddDefaultTokenProviders();
+// --- REGISTER LAYERS ---
+builder.Services.AddControllers();
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
 
 /// <summary>
 /// Configure CORS using an environment variable for better security.
@@ -41,8 +28,6 @@ builder.Services.AddCors(options =>
               .AllowCredentials();
     });
 });
-
-builder.Services.AddControllers();
 
 /// <summary>
 /// Configure Swagger/OpenAPI for interactive documentation.

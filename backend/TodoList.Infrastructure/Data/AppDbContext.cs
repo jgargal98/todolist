@@ -36,23 +36,9 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     /// <param name="builder">The builder being used to construct the model for this context.</param>
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        // Essential: Calls the Identity implementation first
         base.OnModelCreating(builder);
 
-        // Configure SubTasks as a JSON column inside TaskItem
-        builder.Entity<TaskItem>()
-            .OwnsMany(t => t.SubTasks, navigationBuilder =>
-            {
-                navigationBuilder.ToJson();
-            });
-
-        // Configure Many-to-Many relationship for Tasks and Tags
-        builder.Entity<TaskItem>()
-            .HasMany(t => t.Tags)
-            .WithMany(t => t.Tasks)
-            .UsingEntity(j => j.ToTable("Task_Tags"));
-
-        // Enforce enum to string or int conversion if needed 
-        // (EF saves enums as int by default, which matches your schema)
+        // This line scans the current project for all IEntityTypeConfiguration classes
+        builder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
     }
 }

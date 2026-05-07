@@ -1,61 +1,37 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using System;
+using System.Collections.Generic;
 
 namespace TodoList.Domain.Entities;
 
 /// <summary>
-/// Represents a task item created by a user, including its subtasks and status.
+/// Main Task entity based on the ERD.
 /// </summary>
 public class TaskItem
 {
-    /// <summary>
-    /// Unique identifier for the task.
-    /// </summary>
-    [Key]
-    public string Id { get; set; } = Guid.NewGuid().ToString();
-
-    /// <summary>
-    /// Title or summary of the task.
-    /// </summary>
-    [Required]
-    [MaxLength(200)]
+    public Guid Id { get; set; }
     public string Title { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Detailed description of the task.
-    /// </summary>
-    public string? Desc { get; set; }
+    /// <summary>Mapped to 'desc' in ERD</summary>
+    public string? Description { get; set; }
 
-    /// <summary>
-    /// Date and time when the task is due.
-    /// </summary>
-    public DateTime DueDate { get; set; }
+    /// <summary>Mapped to 'duedate' in ERD</summary>
+    public DateTime? DueDate { get; set; }
 
-    /// <summary>
-    /// Current status of the task using the TaskStatus enum.
-    /// </summary>
-    [Required]
+    /// <summary>Mapped to 'status' in ERD</summary>
     public TaskStatus Status { get; set; } = TaskStatus.Pending;
 
     /// <summary>
-    /// Collection of subtasks stored as a JSON object in the database column.
+    /// Stored as JSON in the database as per ERD 'subTask: JSON'.
     /// </summary>
-    public virtual ICollection<SubTask> SubTasks { get; set; } = new List<SubTask>();
+    public List<SubTask> SubTasks { get; set; } = new List<SubTask>();
 
-    /// <summary>
-    /// Foreign key referencing the owner of the task (Identity User).
-    /// </summary>
-    [Required]
-    public string IdUser { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Navigation property for the user who owns this task.
-    /// </summary>
-    [ForeignKey("IdUser")]
+    // Foreign Keys & Navigation
+    public string UserId { get; set; } = string.Empty;
     public virtual ApplicationUser User { get; set; } = null!;
 
-    /// <summary>
-    /// Navigation property for the many-to-many relationship with Tags.
-    /// </summary>
+    public Guid? CategoryId { get; set; }
+    public virtual Category? Category { get; set; }
+
     public virtual ICollection<Tag> Tags { get; set; } = new List<Tag>();
+    public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
 }

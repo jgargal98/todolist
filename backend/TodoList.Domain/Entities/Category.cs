@@ -1,34 +1,26 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using System;
+using System.Collections.Generic;
 
 namespace TodoList.Domain.Entities;
 
 /// <summary>
-/// Represents a category used to organize tasks or user information.
+/// Represents a category to group tasks. 
+/// Each category belongs to a specific user.
 /// </summary>
 public class Category
 {
-    /// <summary>
-    /// Unique identifier for the category.
-    /// </summary>
-    [Key]
-    public string Id { get; set; } = Guid.NewGuid().ToString();
-
-    /// <summary>
-    /// Name of the category.
-    /// </summary>
-    [Required]
+    public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
 
     /// <summary>
-    /// Foreign key referencing the owner of the category.
+    /// Foreign Key to the User who owns this category (from ERD).
     /// </summary>
-    [Required]
-    public string IdUser { get; set; } = string.Empty;
+    public string UserId { get; set; } = string.Empty;
+    public virtual ApplicationUser User { get; set; } = null!;
 
     /// <summary>
-    /// Navigation property for the user who owns this category.
+    /// Navigation property: List of tasks under this category.
+    /// This fixes the "Category does not contain a definition for Tasks" error.
     /// </summary>
-    [ForeignKey("IdUser")]
-    public virtual ApplicationUser User { get; set; } = null!;
+    public virtual ICollection<TaskItem> Tasks { get; set; } = new List<TaskItem>();
 }
