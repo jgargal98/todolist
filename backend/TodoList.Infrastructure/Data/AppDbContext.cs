@@ -1,0 +1,58 @@
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using TodoList.Domain.Entities;
+
+namespace TodoList.Infrastructure.Data;
+
+/// <summary>
+/// Database context for the application, managing Identity and Domain entities mapping.
+/// </summary>
+public class AppDbContext : IdentityDbContext<ApplicationUser>
+{
+    /// <summary>
+    /// Initializes a new instance of the AppDbContext.
+    /// </summary>
+    /// <param name="options">The options to be used by a DbContext.</param>
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+
+    /// <summary>
+    /// Gets or sets the Tasks table.
+    /// </summary>
+    public DbSet<TaskItem> Tasks { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Tags table.
+    /// </summary>
+    public DbSet<Tag> Tags { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Categories table.
+    /// </summary>
+    public DbSet<Category> Categories { get; set; }
+
+    /// <summary>
+    /// Configures the database schema and relationships using Fluent API.
+    /// </summary>
+    /// <param name="builder">The builder being used to construct the model for this context.</param>
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        // Essential: Calls the Identity implementation first
+        base.OnModelCreating(builder);
+
+        // Configure SubTasks as a JSON column inside TaskItem
+        builder.Entity<TaskItem>()
+            .OwnsMany(t => t.SubTasks, navigationBuilder =>
+            {
+                navigationBuilder.ToJson();
+            });
+
+        // Configure Many-to-Many relationship for Tasks and Tags
+        builder.Entity<TaskItem>()
+            .HasMany(t => t.Tags)
+            .WithMany(t => t.Tasks)
+            .UsingEntity(j => j.ToTable("Task_Tags"));
+
+        // Enforce enum to string or int conversion if needed 
+        // (EF saves enums as int by default, which matches your schema)
+    }
+}

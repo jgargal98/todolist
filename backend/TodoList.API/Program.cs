@@ -1,94 +1,92 @@
-// 1. IMPORTANTE: Ahora los usings deben apuntar a tus nuevas capas
-//using Microsoft.EntityFrameworkCore;
-// using TodoList.Infrastructure.Data; // Descomenta esto cuando crees tu AppDbContext ahí
-// using TodoList.Domain.Entities;     // Descomenta esto cuando crees tu User ahí
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using TodoList.Domain.Entities;
+using TodoList.Infrastructure.Data;
+using System.Reflection;
+using Microsoft.OpenApi;
+using TodoList.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- CONFIGURACIÓN DE SERVICIOS (El "Contenedor") ---
+// --- 1. SERVICE CONFIGURATION (Dependency Injection Container) ---
 
-// ¡NUEVO! Le decimos a .NET que busque y prepare nuestros [ApiController]
-builder.Services.AddControllers();
-
-// Mantenemos OpenAPI (para que tengas documentación de tu API automática)
-builder.Services.AddOpenApi();
-
-/*
-// Tu configuración de Base de Datos
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-if (string.IsNullOrEmpty(connectionString))
-{
-    throw new Exception("¡La cadena de conexión está vacía! Revisa la configuración en Azure/appsettings.json.");
-}
+/// <summary>
+/// Configure the Database Context with SQL Server.
+/// </summary>
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connectionString, sqlOptions =>
-        sqlOptions.EnableRetryOnFailure()));
+    options.UseSqlServer(connectionString));
 
-*/
+/// <summary>
+/// Configure ASP.NET Core Identity for user management and security.
+/// </summary>
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
 
+/// <summary>
+/// Configure CORS using an environment variable for better security.
+/// </summary>
+var frontendUrl = builder.Configuration["FrontendUrl"] ?? "http://localhost:3000"; // Default for local dev
 
-// Tu configuración de CORS (Permitir que Angular se conecte)
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(policy =>
+    options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.WithOrigins(frontendUrl)
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+              .AllowCredentials();
     });
+});
+
+builder.Services.AddControllers();
+
+/// <summary>
+/// Configure Swagger/OpenAPI for interactive documentation.
+/// </summary>
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "ToDo List API",
+        Version = "v1",
+        Description = "Clean Architecture API with Identity and JSON Subtasks support."
+    });
+
+    // Enable XML comments for Swagger
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    options.IncludeXmlComments(xmlPath);
 });
 
 var app = builder.Build();
 
-// --- CONFIGURACIÓN DEL PIPELINE HTTP (El "Túnel" de peticiones) ---
-app.MapOpenApi();
-app.UseHttpsRedirection();
-app.UseCors();
+// --- 2. MIDDLEWARE PIPELINE (Request Handling) ---
+/// <summary>
+/// Define the request processing pipeline using Middlewares.
+/// </summary>
+// Enables Swagger UI in both Development and Production (helpful for tutors)
+app.UseSwagger();
+app.UseSwaggerUI();
 
-//Mapear los Controladores (conecta las rutas como /api/Auth con tus clases)
+app.UseHttpsRedirection();
+// Use CORS before Authentication
+app.UseCors("AllowFrontend");
+// Crucial: Identification of the user
+app.UseAuthentication();
+// Crucial: Checking user permissions
+app.UseAuthorization();
+// Route requests to Controller actions
 app.MapControllers();
 
-/*using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.EnsureCreated();
-}*/
-
-
-// --- TU CÓDIGO DE INICIALIZACIÓN Y PRUEBAS ---
-// "Hello World"
-// Endpoints de prueba (Minimal APIs)
-app.MapGet("/api/", () => "Si lees esto me debes 20 pavos");
-
-/*
-app.MapGet("/test-db", async (AppDbContext db) =>
-{
-    try
-    {
-        var count = await db.Users.CountAsync();
-        return Results.Ok(new { mensaje = "Connection success", totalUsuarios = count });
-    }
-    catch (Exception ex)
-    {
-        return Results.Problem($"Connection error: {ex.Message}");
-    }
-});
-
-
-// BORRAR AL EMPEZAR A PROBAR LA API EN SERIO
-app.MapGet("/reset-db", (AppDbContext db) =>
-{
-    try
-    {
-        db.Database.EnsureDeleted();
-        db.Database.EnsureCreated();
-        return Results.Ok(new { mensaje = "Base de datos borrada y reconstruida" });
-    }
-    catch (Exception ex)
-    {
-        return Results.Problem($"Error al reiniciar: {ex.Message}");
-    }
-});*/
+// --- 3. DATABASE CREATION AND MANAGEMENT ---
+/// <summary>
+/// Automatically applies migrations at startup to ensure the database is ready.
+/// </summary>
+app.Services.InitializeDatabase(app.Environment.IsDevelopment());
 
 app.Run();
