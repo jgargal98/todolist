@@ -33,23 +33,15 @@ public static class DbInitializer
 
         try
         {
-            logger.LogWarning("Dropping and recreating database...");
-            context.Database.EnsureDeleted();
+            logger.LogInformation("Iniciando con BBDD limpia..."); // Nuevo log para confirmar cambio
+            context.Database.EnsureCreated();
 
-            // Applying any pending EF Core migrations to the SQL Server / Azure SQL instance
-            logger.LogInformation("Applying pending migrations to the database...");
-            context.Database.Migrate();
-
-            // Executing the seed logic for the administrative user
-            // We use .GetAwaiter().GetResult() to block the startup until seeding completes
-            SeedAdminUserAsync(services, logger, configuration).GetAwaiter().GetResult();
-
-            logger.LogInformation("Database initialization completed successfully.");
+            var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+            SeedAdminUserAsync(scope.ServiceProvider, logger, config).GetAwaiter().GetResult();
         }
         catch (Exception ex)
         {
-            logger.LogCritical(ex, "A fatal error occurred during the database initialization process.");
-            throw; // Fail-fast to prevent the application from running in an inconsistent state
+            logger.LogError($"Error: {ex.Message}");
         }
     }
 
