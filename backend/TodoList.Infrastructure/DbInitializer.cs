@@ -22,28 +22,34 @@ public static class DbInitializer
     /// <exception cref="Exception">Throws an exception if the migration or seeding process fails.</exception>
     public static void InitializeDatabase(this IServiceProvider serviceProvider, bool isDevelopment)
     {
+        // Creating a new scope to resolve scoped services safely
         using var scope = serviceProvider.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger<AppDbContext>>();
+        var services = scope.ServiceProvider;
+
+        // Resolving required infrastructure services
+        var context = services.GetRequiredService<AppDbContext>();
+        var logger = services.GetRequiredService<ILogger<AppDbContext>>();
+        var configuration = services.GetRequiredService<IConfiguration>();
 
         try
         {
-            // Forzamos la limpieza: Borra todo lo que existe en Azure ahora mismo
-            logger.LogWarning("Limpiando base de datos para resolver conflictos de esquema...");
+            logger.LogWarning("Dropping and recreating database...");
             context.Database.EnsureDeleted();
 
-            // Crea las tablas de nuevo según tu código actual
-            logger.LogInformation("Creando tablas desde cero...");
-            context.Database.EnsureCreated();
+            // Applying any pending EF Core migrations to the SQL Server / Azure SQL instance
+            logger.LogInformation("Applying pending migrations to the database...");
+            context.Database.Migrate();
 
-            // Seed
-            var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
-            SeedAdminUserAsync(scope.ServiceProvider, logger, config).GetAwaiter().GetResult();
+            // Executing the seed logic for the administrative user
+            // We use .GetAwaiter().GetResult() to block the startup until seeding completes
+            SeedAdminUserAsync(services, logger, configuration).GetAwaiter().GetResult();
+
+            logger.LogInformation("Database initialization completed successfully.");
         }
         catch (Exception ex)
         {
-            logger.LogCritical(ex, "Error fatal en la inicialización.");
-            throw;
+            logger.LogCritical(ex, "A fatal error occurred during the database initialization process.");
+            throw; // Fail-fast to prevent the application from running in an inconsistent state
         }
     }
 
