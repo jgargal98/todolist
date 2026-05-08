@@ -15,6 +15,8 @@ builder.Services.AddAutoMapper(cfg =>
     cfg.AddProfile<UserProfile>();
 }, AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddControllers();
+
+//Dependency Injection for every service and config
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
