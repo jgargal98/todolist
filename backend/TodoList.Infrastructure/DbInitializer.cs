@@ -22,29 +22,35 @@ public static class DbInitializer
     /// <exception cref="Exception">Throws an exception if the migration or seeding process fails.</exception>
     public static void InitializeDatabase(this IServiceProvider serviceProvider, bool isDevelopment)
     {
-        // Creating a new scope to resolve scoped services safely
         using var scope = serviceProvider.CreateScope();
-        var services = scope.ServiceProvider;
-
-        // Resolving required infrastructure services
-        var context = services.GetRequiredService<AppDbContext>();
-        var logger = services.GetRequiredService<ILogger<AppDbContext>>();
-        var configuration = services.GetRequiredService<IConfiguration>();
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<AppDbContext>>();
 
         try
         {
-            logger.LogInformation("Iniciando con BBDD limpia..."); // Nuevo log para confirmar cambio
+            context.Database.SetCommandTimeout(120);
+
+            // LOG DE CONTROL
+            logger.LogInformation("Verifying sql tables...");
+
+            // EnsureCreated creará AspNetUsers si no existe. 
+            // Si ya existe alguna tabla, simplemente no hará nada.
             context.Database.EnsureCreated();
 
+            logger.LogInformation("SQL TABLES SUCCESSFULLY VERIFIED.");
+
+            // Intentamos el Seed
             var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
             SeedAdminUserAsync(scope.ServiceProvider, logger, config).GetAwaiter().GetResult();
+
+            logger.LogInformation("Seed done.");
         }
         catch (Exception ex)
         {
-            logger.LogError($"Error: {ex.Message}");
+            logger.LogCritical($"ERROR: {ex.Message}");
+            // No relanzamos para que la API siga viva y responda
         }
     }
-
     /// <summary>
     /// Seeds a default Administrator user using credentials from environment variables or configuration.
     /// </summary>
