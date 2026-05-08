@@ -35,6 +35,7 @@ public static class DbInitializer
 
             // EnsureCreated creará AspNetUsers si no existe. 
             // Si ya existe alguna tabla, simplemente no hará nada.
+            context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
 
             logger.LogInformation("SQL TABLES SUCCESSFULLY VERIFIED.");
